@@ -23,9 +23,10 @@ try:
 except ImportError:
     pass
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(base_dir, '..', '001'))
-
+import sys
+import os
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0,current_dir)
 from ipso_bp_slope_stability import create_features, OptimizedEnsemble
 
 st.set_page_config(
@@ -36,7 +37,7 @@ st.set_page_config(
 )
 
 OPTIMAL_THRESHOLD = 0.7160
-MODEL_PATH = os.path.join(base_dir, '..', '001', 'ipso_bp_model_output', 'ipso_bp_ensemble_model.pkl')
+MODEL_PATH = os.path.join(current_dir, 'ipso_bp_ensemble_model.pkl')
 
 @st.cache_resource
 def load_model():
