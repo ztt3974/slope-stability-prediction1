@@ -1,0 +1,25 @@
+[server]
+enableCORS = false
+enableXsrfProtection = true
+headless = true
+port = 8501
+baseUrlPath = ""
+
+[browser]
+gatherUsageStats = false
+serverAddress = "localhost"
+
+[theme]
+primaryColor = "#1f77b4"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f0f2f6"
+textColor = "#262730"
+font = "sans serif"
+
+[client]
+showErrorDetails = false
+toolbarMode = "minimal"
+
+[logger]
+level = "info"
+messageFormat = "%(message)s"
