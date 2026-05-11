@@ -87,16 +87,16 @@ def validate_inputs(H, beta, C, phi, Y, r_u):
     """验证输入参数的合理性"""
     errors = []
     
-    if not (0.5 <= H <= 200):
-        errors.append(f"坡高 H 应在 0.5-200m 范围内，当前值: {H}")
+    if not (0.5 <= H <= 500):
+        errors.append(f"坡高 H 应在 0.5-500m 范围内，当前值: {H}")
     if not (5 <= beta <= 90):
         errors.append(f"坡角 β 应在 5-90° 范围内，当前值: {beta}")
     if not (0 <= C <= 500):
         errors.append(f"粘聚力 C 应在 0-500kPa 范围内，当前值: {C}")
     if not (0 <= phi <= 60):
         errors.append(f"内摩擦角 φ 应在 0-60° 范围内，当前值: {phi}")
-    if not (10 <= Y <= 30):
-        errors.append(f"容重 γ 应在 10-30 kg/m³ 范围内，当前值: {Y}")
+    if not (5 <= Y <= 50):
+        errors.append(f"容重 γ 应在 5-50 kg/m³ 范围内，当前值: {Y}")
     if not (0 <= r_u <= 1):
         errors.append(f"孔隙水压力比 ru 应在 0-1 范围内，当前值: {r_u}")
     
@@ -123,7 +123,7 @@ def main():
             H = st.number_input(
                 "坡高 H (m)",
                 min_value=0.5,
-                max_value=200.0,
+                max_value=500.0,
                 value=20.0,
                 step=1.0,
                 help="边坡的高度，单位：米"
@@ -159,8 +159,8 @@ def main():
             
             Y = st.number_input(
                 "容重 γ (kg/m³)",
-                min_value=10.0,
-                max_value=30.0,
+                min_value=5.0,
+                max_value=50.0,
                 value=20.0,
                 step=0.5,
                 help="土壤容重，单位：千克/立方米"
