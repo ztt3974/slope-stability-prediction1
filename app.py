@@ -30,7 +30,7 @@ sys.path.insert(0,current_dir)
 from ipso_bp_slope_stability import create_features, OptimizedEnsemble
 
 st.set_page_config(
-    page_title="边坡稳定性预测系统",
+    page_title="Slope Stability Prediction System",
     page_icon="⛰️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -62,7 +62,7 @@ def load_model():
                 if 'devnull' in locals():
                     devnull.close()
             
-            return model, True, "模型加载成功"
+            return model, True, "Model loaded successfully"
             
         except UnicodeEncodeError as e:
             return None, False, f"⚠️ 模型编码错误: {str(e)}<br><br>**解决方案**:<br>1. 运行修复脚本: `python fix_encoding.py`<br>2. 使用修复后的脚本重新训练: `python ipso_bp_slope_stability_fixed.py`<br>3. 重启本应用"
@@ -84,110 +84,110 @@ def init_session_state():
         st.session_state.prediction_made = False
 
 def validate_inputs(H, beta, C, phi, Y, r_u):
-    """验证输入参数的合理性"""
+    """Validate input parameters"""
     errors = []
     
     if not (0.5 <= H <= 500):
-        errors.append(f"坡高 H 应在 0.5-500m 范围内，当前值: {H}")
+        errors.append(f"Slope Height H should be in range 0.5-500m，current value: {H}")
     if not (5 <= beta <= 90):
-        errors.append(f"坡角 β 应在 5-90° 范围内，当前值: {beta}")
+        errors.append(f"Slope Angle β should be in range 5-90°，current value: {beta}")
     if not (0 <= C <= 500):
-        errors.append(f"粘聚力 C 应在 0-500kPa 范围内，当前值: {C}")
+        errors.append(f"Cohesion C should be in range 0-500kPa，current value: {C}")
     if not (0 <= phi <= 60):
-        errors.append(f"内摩擦角 φ 应在 0-60° 范围内，当前值: {phi}")
+        errors.append(f"Internal Friction Angle φ should be in range 0-60°，current value: {phi}")
     if not (5 <= Y <= 50):
-        errors.append(f"容重 γ 应在 5-50 kg/m³ 范围内，当前值: {Y}")
+        errors.append(f"Unit Weight γ should be in range 5-50 kg/m³，current value: {Y}")
     if not (0 <= r_u <= 1):
-        errors.append(f"孔隙水压力比 ru 应在 0-1 范围内，当前值: {r_u}")
+        errors.append(f"Pore Water Pressure Ratio ru should be in range 0-1，current value: {r_u}")
     
     return errors
 
 def main():
     init_session_state()
     
-    st.title("⛰️ 边坡稳定性智能预测系统")
+    st.title("⛰️ Slope Stability Intelligent Prediction System")
     st.markdown("""
-    **基于集成学习模型**  
-    输入边坡几何与力学参数，预测边坡稳定状态
+    **Based on Ensemble Learning Model**  
+    Input slope geometry and mechanical parameters to predict slope stability
     """)
     
     model, model_loaded, model_msg = load_model()
     
     with st.sidebar:
-        st.header("📊 参数输入")
+        st.header("📊 Parameter Input")
         st.markdown("---")
         
         col1, col2 = st.columns(2)
         
         with col1:
             H = st.number_input(
-                "坡高 H (m)",
+                "Slope Height H (m)",
                 min_value=0.5,
                 max_value=500.0,
                 value=20.0,
                 step=1.0,
-                help="边坡的高度，单位：米"
+                help="Height of the slope, unit: meters"
             )
             
             beta = st.number_input(
-                "坡角 β (°)",
+                "Slope Angle β (°)",
                 min_value=5.0,
                 max_value=90.0,
                 value=45.0,
                 step=1.0,
-                help="边坡的倾斜角度，单位：度"
+                help="Inclination angle of the slope, unit: degrees"
             )
             
             C = st.number_input(
-                "粘聚力 C (kPa)",
+                "Cohesion C (kPa)",
                 min_value=0.0,
                 max_value=500.0,
                 value=25.0,
                 step=1.0,
-                help="土壤粘聚力，单位：千帕"
+                help="Soil cohesion, unit: kilopascals"
             )
         
         with col2:
             phi = st.number_input(
-                "内摩擦角 φ (°)",
+                "Internal Friction Angle φ (°)",
                 min_value=0.0,
                 max_value=60.0,
                 value=30.0,
                 step=1.0,
-                help="土壤内摩擦角，单位：度"
+                help="Soil internal friction angle, unit: degrees"
             )
             
             Y = st.number_input(
-                "容重 γ (kg/m³)",
+                "Unit Weight γ (kg/m³)",
                 min_value=5.0,
                 max_value=50.0,
                 value=20.0,
                 step=0.5,
-                help="土壤容重，单位：千克/立方米"
+                help="Soil unit weight, unit: kilograms per cubic meter"
             )
             
             r_u = st.number_input(
-                "孔隙水压力比 ru",
+                "Pore Water Pressure Ratio ru",
                 min_value=0.0,
                 max_value=1.0,
                 value=0.25,
                 step=0.05,
-                help="孔隙水压力系数，范围0-1"
+                help="Pore water pressure coefficient, range: 0-1"
             )
         
         st.markdown("---")
         
-        predict_btn = st.button("🚀 开始预测", type="primary", use_container_width=True)
+        predict_btn = st.button("🚀 Start Prediction", type="primary", use_container_width=True)
         
         st.markdown("---")
-        st.markdown("**参数说明**")
+        st.markdown("**Parameter Description**")
         st.info("""
-        - **H**: 边坡高度 (m)
-        - **β**: 坡角角度 (°)  
-        - **C**: 土壤粘聚力 (kPa)
-        - **φ**: 内摩擦角 (°)
-        - **γ**: 土壤容重 (kg/m³)
-        - **ru**: 孔隙水压力比
+        - **H**: Slope Height (m)
+        - **β**: Slope Angle (°)  
+        - **C**: Soil Cohesion (kPa)
+        - **φ**: Internal Friction Angle (°)
+        - **γ**: Unit Weight (kg/m³)
+        - **ru**: Pore Water Pressure Ratio
         """)
     
     if not model_loaded:
@@ -227,21 +227,21 @@ def perform_prediction(model, H, beta, C, phi, Y, r_u):
             
             prediction = int(stability_proba >= OPTIMAL_THRESHOLD)
             
-            status_text = "稳定 ✅" if prediction == 1 else "不稳定 ❌"
+            status_text = "Stable ✅" if prediction == 1 else "Unstable ❌"
             
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
             record = {
-                '时间戳': timestamp,
-                '坡高 H(m)': H,
-                '坡角 β(°)': beta,
-                '粘聚力 C(kPa)': C,
-                '内摩擦角 φ(°)': phi,
-                '容重 γ (kg/m³)': Y,
-                '孔隙水压力比 ru': r_u,
-                '预测状态': status_text,
-                '稳定概率': round(stability_proba * 100, 2),
-                '使用阈值': OPTIMAL_THRESHOLD
+                'Timestamp': timestamp,
+                'Slope Height H(m)': H,
+                'Slope Angle β(°)': beta,
+                'Cohesion C(kPa)': C,
+                'Internal Friction Angle φ(°)': phi,
+                'Unit Weight γ (kg/m³)': Y,
+                'Pore Water Pressure Ratio ru': r_u,
+                'Prediction Status': status_text,
+                'Stability Probability': round(stability_proba * 100, 2),
+                'Used Threshold': OPTIMAL_THRESHOLD
             }
             
             st.session_state.history.insert(0, record)
@@ -256,20 +256,20 @@ def perform_prediction(model, H, beta, C, phi, Y, r_u):
             }
             st.session_state.prediction_made = True
             
-            st.success("✅ 预测完成！", icon="✅")
+            st.success("✅ Prediction Complete！", icon="✅")
             st.balloons()
             
     except Exception as e:
-        st.error(f"❌ 预测过程出错: {str(e)}", icon="🚫")
-        st.error("请检查输入参数或联系系统管理员")
+        st.error(f"❌ Prediction Error: {str(e)}", icon="🚫")
+        st.error("Please check input parameters or contact system administrator")
 
 def display_results_section():
-    """显示预测结果区域"""
+    """Display prediction results section"""
     if st.session_state.prediction_made and hasattr(st.session_state, 'prediction_result'):
         result = st.session_state.prediction_result
         
         st.markdown("---")
-        st.header("📈 预测结果")
+        st.header("📈 Prediction Results")
         
         col_result, col_prob = st.columns([1, 2])
         
@@ -285,7 +285,7 @@ def display_results_section():
                     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                 ">
                     <h2 style="margin: 0; font-size: 48px;">✅</h2>
-                    <h3 style="margin: 10px 0 0 0;">稳 定</h3>
+                    <h3 style="margin: 10px 0 0 0;">STABLE</h3>
                 </div>
                 """, unsafe_allow_html=True)
             else:
@@ -299,12 +299,12 @@ def display_results_section():
                     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                 ">
                     <h2 style="margin: 0; font-size: 48px;">❌</h2>
-                    <h3 style="margin: 10px 0 0 0;">不稳定</h3>
+                    <h3 style="margin: 10px 0 0 0;">UNSTABLE</h3>
                 </div>
                 """, unsafe_allow_html=True)
         
         with col_prob:
-            st.subheader("稳定概率")
+            st.subheader("Stability Probability")
             prob_percent = result['probability'] * 100
             
             prob_color = "#00c853" if result['prediction'] == 1 else "#ff5252"
@@ -345,46 +345,46 @@ def display_results_section():
                     color: #666;
                     font-size: 14px;
                 ">
-                    判断阈值: {OPTIMAL_THRESHOLD} ({OPTIMAL_THRESHOLD*100:.2f}%)
+                    Decision Threshold: {OPTIMAL_THRESHOLD} ({OPTIMAL_THRESHOLD*100:.2f}%)
                 </div>
             </div>
             """, unsafe_allow_html=True)
         
-        with st.expander("📋 查看输入参数详情", expanded=False):
+        with st.expander("📋 View Input Parameter Details", expanded=False):
             params_df = pd.DataFrame([
-                {"参数": "坡高 H", "值": f"{result['input_params']['H']} m"},
-                {"参数": "坡角 β", "值": f"{result['input_params']['beta']}°"},
-                {"参数": "粘聚力 C", "值": f"{result['input_params']['C']} kPa"},
-                {"参数": "内摩擦角 φ", "值": f"{result['input_params']['phi']}°"},
-                {"参数": "容重 γ", "值": f"{result['input_params']['Y']} kg/m³"},
-                {"参数": "孔隙水压力比 ru", "值": result['input_params']['r_u']}
+                {"Parameter": "Slope Height H", "Value": f"{result['input_params']['H']} m"},
+                {"Parameter": "Slope Angle β", "Value": f"{result['input_params']['beta']}°"},
+                {"Parameter": "Cohesion C", "Value": f"{result['input_params']['C']} kPa"},
+                {"Parameter": "Internal Friction Angle φ", "Value": f"{result['input_params']['phi']}°"},
+                {"Parameter": "Unit Weight γ", "Value": f"{result['input_params']['Y']} kg/m³"},
+                {"Parameter": "Pore Water Pressure Ratio ru", "Value": result['input_params']['r_u']}
             ])
             st.table(params_df)
 
 def display_history_section():
-    """显示历史记录区域"""
+    """Display prediction history section"""
     st.markdown("---")
-    st.header("📜 预测历史记录")
+    st.header("📜 Prediction History")
     
     if len(st.session_state.history) == 0:
-        st.info("暂无预测记录，请在左侧输入参数并进行预测")
+        st.info("No prediction records yet. Please input parameters on the left and perform prediction.")
         return
     
     col_table, col_export = st.columns([3, 1])
     
     with col_export:
         export_format = st.selectbox(
-            "导出格式",
+            "Export Format",
             ["Excel (.xlsx)", "CSV (.csv)"],
             label_visibility="collapsed"
         )
         
-        if st.button("📥 导出记录", use_container_width=True):
+        if st.button("📥 Export Records", use_container_width=True):
             export_history(export_format)
         
-        if st.button("🗑️ 清空记录", use_container_width=True):
+        if st.button("🗑️ Clear Records", use_container_width=True):
             st.session_state.history = []
-            st.success("历史记录已清空")
+            st.success("History cleared successfully")
             st.rerun()
     
     with col_table:
@@ -395,30 +395,30 @@ def display_history_section():
             use_container_width=True,
             hide_index=True,
             column_config={
-                "时间戳": st.column_config.TextColumn("时间戳", width="medium"),
-                "预测状态": st.column_config.TextColumn("状态", width="small"),
-                "稳定概率": st.column_config.ProgressColumn(
-                    "稳定概率 (%)",
+                "Timestamp": st.column_config.TextColumn("时间戳", width="medium"),
+                "Prediction Status": st.column_config.TextColumn("状态", width="small"),
+                "Stability Probability": st.column_config.ProgressColumn(
+                    "Stability Probability (%)",
                     format="%f%%",
                     min_value=0,
                     max_value=100
                 ),
-                "坡高 H(m)": st.column_config.NumberColumn("H (m)", format="%.1f"),
-                "坡角 β(°)": st.column_config.NumberColumn("β (°)", format="%.1f"),
-                "粘聚力 C(kPa)": st.column_config.NumberColumn("C (kPa)", format="%.1f"),
-                "内摩擦角 φ(°)": st.column_config.NumberColumn("φ (°)", format="%.1f"),
-                "容重 γ (kg/m³)": st.column_config.NumberColumn("γ (kg/m³)", format="%.1f"),
-                "孔隙水压力比 ru": st.column_config.NumberColumn("ru", format="%.3f"),
-                "使用阈值": st.column_config.NumberColumn("阈值", format="%.4f")
+                "Slope Height H(m)": st.column_config.NumberColumn("H (m)", format="%.1f"),
+                "Slope Angle β(°)": st.column_config.NumberColumn("β (°)", format="%.1f"),
+                "Cohesion C(kPa)": st.column_config.NumberColumn("C (kPa)", format="%.1f"),
+                "Internal Friction Angle φ(°)": st.column_config.NumberColumn("φ (°)", format="%.1f"),
+                "Unit Weight γ (kg/m³)": st.column_config.NumberColumn("γ (kg/m³)", format="%.1f"),
+                "Pore Water Pressure Ratio ru": st.column_config.NumberColumn("ru", format="%.3f"),
+                "Used Threshold": st.column_config.NumberColumn("阈值", format="%.4f")
             }
         )
         
         st.info(f"共 {len(st.session_state.history)} 条预测记录")
 
 def export_history(format_type):
-    """导出历史记录"""
+    """Export prediction history"""
     if len(st.session_state.history) == 0:
-        st.warning("没有可导出的记录")
+        st.warning("No records to export")
         return
     
     try:
@@ -428,22 +428,22 @@ def export_history(format_type):
         if "Excel" in format_type:
             filename = f"slope_stability_history_{timestamp}.xlsx"
             history_df.to_excel(filename, index=False, engine='openpyxl')
-            st.success(f"✅ 已导出为 Excel 文件: {filename}")
+            st.success(f"✅ Exported to Excel file: {filename}")
         else:
             filename = f"slope_stability_history_{timestamp}.csv"
             history_df.to_csv(filename, index=False, encoding='utf-8-sig')
-            st.success(f"✅ 已导出为 CSV 文件: {filename}")
+            st.success(f"✅ Exported to CSV file: {filename}")
         
         with open(filename, 'rb') as f:
             st.download_button(
-                label="📥 下载文件",
+                label="📥 Download File",
                 data=f,
                 file_name=filename,
                 mime="application/vnd.ms-excel" if "Excel" in format_type else "text/csv"
             )
             
     except Exception as e:
-        st.error(f"导出失败: {str(e)}")
+        st.error(f"Export failed: {str(e)}")
 
 if __name__ == "__main__":
     main()
