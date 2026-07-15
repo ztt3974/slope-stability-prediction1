@@ -740,35 +740,45 @@ class OptimizedEnsemble:
 
 
 def plot_results(model, metrics, save_dir):
-    fig, axes = plt.subplots(2, 2, figsize=(14, 12))
-    
-    ax1 = axes[0, 0]
-    ax1.plot(metrics['fpr'], metrics['tpr'], 'b-', linewidth=2, label=f'ROC曲线 (AUC = {metrics["roc_auc"]:.4f})')
-    ax1.plot([0, 1], [0, 1], 'r--', linewidth=2, label='随机猜测 (AUC = 0.5000)')
+    fig_roc, ax1 = plt.subplots(figsize=(8, 6))
+    ax1.plot(metrics['fpr'], metrics['tpr'], 'b-', linewidth=2, label=f'ROC curve (AUC = {metrics["roc_auc"]:.4f})')
+    ax1.plot([0, 1], [0, 1], 'r--', linewidth=2, label='Random guess (AUC = 0.5000)')   
     
     ax1.set_xlim([0.0, 1.0])
     ax1.set_ylim([0.0, 1.05])
-    ax1.set_xlabel('假正率 (FPR)', fontsize=12, ha='center')
-    ax1.set_ylabel('真正率 (TPR)', fontsize=12, va='center')
-    
-    ax1.legend(loc='lower right', fontsize=10)
+    ax1.set_xlabel('FPR', fontsize=20, ha='center')
+    ax1.set_ylabel('TPR', fontsize=20, va='center')
+    #ax1.set_title('ROC Curve', fontsize=20, fontweight='bold')
+    ax1.tick_params(axis='both', labelsize=18)
+    ax1.legend(loc='lower right', fontsize=20)
     ax1.grid(True, alpha=0.3)
     
-    ax2 = axes[0, 1]
+    plt.tight_layout()
+    roc_path = os.path.join(save_dir, 'roc_curve.png')
+    plt.savefig(roc_path, dpi=300, bbox_inches='tight')
+    plt.close(fig_roc)
+    
+    fig_cm, ax2 = plt.subplots(figsize=(8, 6))
     cm = metrics['confusion_matrix']
     
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax2,
-               xticklabels=['不稳定', '稳定'],
-               yticklabels=['不稳定', '稳定'],
+               xticklabels=['Unstable', 'Stable'],
+               yticklabels=['Unstable', 'Stable'],
                annot_kws={'size': 20, 'weight': 'bold'})
     
-    ax2.set_xlabel('预测值', fontsize=16)
-    ax2.set_ylabel('实际值', fontsize=16)
-    ax2.tick_params(axis='both', labelsize=15)
+    ax2.set_xlabel('Predicted Label', fontsize=16)
+    ax2.set_ylabel('True Label', fontsize=16)
+    ax2.set_title('Confusion Matrix', fontsize=14, fontweight='bold')
+    ax2.tick_params(axis='both', labelsize=14)
     
-    ax2.text(2.3, 0.5, '', fontsize=11, va='center')
+    plt.tight_layout()
+    cm_path = os.path.join(save_dir, 'confusion_matrix.png')
+    plt.savefig(cm_path, dpi=300, bbox_inches='tight')
+    plt.close(fig_cm)
     
-    ax3 = axes[1, 0]
+    fig_metrics, axes = plt.subplots(1, 2, figsize=(14, 6))
+    
+    ax3 = axes[0]
     metric_names = ['Accuracy', 'Precision', 'Recall', 'F1-Score', 'ROC-AUC']
     metric_values = [metrics['accuracy'], metrics['precision'], 
                     metrics['recall'], metrics['f1'], metrics['roc_auc']]
@@ -789,7 +799,7 @@ def plot_results(model, metrics, save_dir):
     ax3.legend()
     ax3.grid(True, alpha=0.3, axis='y')
     
-    ax4 = axes[1, 1]
+    ax4 = axes[1]
     model_names = list(model.weights.keys())
     weight_values = list(model.weights.values())
     sorted_idx = np.argsort(weight_values)[::-1]
@@ -803,13 +813,15 @@ def plot_results(model, metrics, save_dir):
     ax4.grid(True, alpha=0.3, axis='y')
     
     plt.tight_layout()
+    metrics_path = os.path.join(save_dir, 'metrics_weights.png')
+    plt.savefig(metrics_path, dpi=300, bbox_inches='tight')
+    plt.close(fig_metrics)
     
-    plot_path = os.path.join(save_dir, 'ipso_bp_results.png')
-    plt.savefig(plot_path, dpi=300, bbox_inches='tight')
-    plt.close()
-    
-    print(f"\n结果图表已保存: {plot_path}")
-    return plot_path
+    print(f"\n结果图表已保存:")
+    print(f"  - ROC曲线: {roc_path}")
+    print(f"  - 混淆矩阵: {cm_path}")
+    print(f"  - 评估指标与权重: {metrics_path}")
+    return roc_path
 
 
 def generate_report(metrics, model, save_dir):
