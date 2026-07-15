@@ -27,7 +27,7 @@ import sys
 import os
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0,current_dir)
-from ipso_bp_slope_stability import create_features, OptimizedEnsemble
+from ipso_bp_slope_stability_fixed import create_features, OptimizedEnsemble
 
 st.set_page_config(
     page_title="Slope Stability Prediction System",
